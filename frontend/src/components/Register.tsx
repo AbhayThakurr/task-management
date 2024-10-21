@@ -7,12 +7,14 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // Set loading to true when starting the request
 
     try {
       const response = await fetch(
@@ -48,7 +50,7 @@ const Register: React.FC = () => {
 
       if (loginResponse.ok) {
         login(loginData.token, loginData.role);
-        alert("User  registered and logged in successfully!"); // Alert for successful registration
+        alert("User registered and logged in successfully!"); // Alert for successful registration
         navigate("/dashboard");
       } else {
         // Handle login error
@@ -56,6 +58,8 @@ const Register: React.FC = () => {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setLoading(false); // Set loading to false when the request is complete
     }
   };
 
@@ -97,9 +101,16 @@ const Register: React.FC = () => {
         />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+          className={`w-full text-white py-2 rounded transition ${
+            loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
+          }`}
+          disabled={loading} // Disable the button when loading
         >
-          Register
+          {loading ? (
+            <span>Loading...</span> // Show loading text
+          ) : (
+            "Register" // Default button text
+          )}
         </button>
         <p className="mt-4 text-center">
           Already have an account?{" "}
