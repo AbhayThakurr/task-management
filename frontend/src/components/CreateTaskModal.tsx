@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 interface CreateTaskModalProps {
   users: Array<{ _id: string; email: string }>;
   onClose: () => void;
@@ -15,9 +16,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
+  const [creating, setCreating] = useState(false); // State for tracking task creation
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCreating(true); // Set creating to true when starting the task creation
 
     try {
       const response = await fetch(
@@ -39,9 +42,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       if (response.ok) {
         onTaskCreated();
         onClose();
+      } else {
+        // Optionally handle the error response
+        console.error("Failed to create task");
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setCreating(false); // Reset creating state when the request is complete
     }
   };
 
@@ -61,9 +69,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Description
-            </label>
+            <label className="block text-sm font-medium mb-1">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -97,9 +103,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className={`px-4 py-2 rounded ${
+                creating ? "bg-gray-400" : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+              disabled={creating} // Disable the button when creating
             >
-              Create
+              {creating ? "Creating..." : "Create"} {/* Show loading text */}
             </button>
           </div>
         </form>
