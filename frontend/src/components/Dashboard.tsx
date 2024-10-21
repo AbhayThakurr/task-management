@@ -24,10 +24,12 @@ const Dashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null); // State for tracking which task is being deleted
+  const [isLoadingTasks, setIsLoadingTasks] = useState<boolean>(false); // State for fetching tasks
   const { token, role } = useAuth();
   const navigate = useNavigate();
 
   const fetchTasks = async () => {
+    setIsLoadingTasks(true); // Set loading state to true
     try {
       const res = await fetch(
         `${import.meta.env.VITE_REACT_APP_API_URL}/api/tasks`,
@@ -41,6 +43,8 @@ const Dashboard: React.FC = () => {
       setTasks(data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoadingTasks(false); // Reset loading state
     }
   };
 
@@ -146,7 +150,11 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      {tasks.length === 0 ? (
+      {isLoadingTasks ? ( // Show loader while fetching tasks
+        <div className="flex justify-center items-center">
+          <div className="animate-spin h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        </div>
+      ) : tasks.length === 0 ? (
         <p className="text-gray-600">
           {role === "user"
             ? "No tasks assigned to you."
