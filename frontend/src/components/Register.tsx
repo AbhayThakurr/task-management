@@ -1,4 +1,3 @@
-// src/components/Register.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -10,8 +9,6 @@ const Register: React.FC = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  console.log(import.meta.env.VITE_REACT_APP_API_URL);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +48,11 @@ const Register: React.FC = () => {
 
       if (loginResponse.ok) {
         login(loginData.token, loginData.role);
+        alert("User  registered and logged in successfully!"); // Alert for successful registration
         navigate("/dashboard");
+      } else {
+        // Handle login error
+        throw new Error(loginData.message || "Login failed");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
