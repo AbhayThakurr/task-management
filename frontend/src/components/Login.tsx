@@ -7,9 +7,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // State for loading
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when the request starts
+
     try {
       const res = await fetch(
         `${import.meta.env.VITE_REACT_APP_API_URL}/api/auth/login`,
@@ -19,10 +22,11 @@ const Login: React.FC = () => {
           body: JSON.stringify({ email, password }),
         }
       );
+
       const data = await res.json();
       if (res.ok && data.token) {
         login(data.token, data.role);
-        alert("User  logged in successfully!"); // Alert for successful login
+        alert("User logged in successfully!"); // Alert for successful login
         navigate("/dashboard");
       } else {
         // Handle error messages from the server
@@ -31,6 +35,8 @@ const Login: React.FC = () => {
     } catch (err) {
       console.error(err);
       alert("An error occurred. Please try again later."); // Alert for network issues
+    } finally {
+      setLoading(false); // Set loading to false when the request is complete
     }
   };
 
@@ -60,9 +66,14 @@ const Login: React.FC = () => {
         />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+          className={`w-full text-white py-2 rounded transition ${loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"}`}
+          disabled={loading} // Disable the button when loading
         >
-          Login
+          {loading ? (
+            <span>Loading...</span> // Show loading text
+          ) : (
+            "Login" // Default button text
+          )}
         </button>
         <p className="mt-4 text-center">
           Don't have an account?{" "}
