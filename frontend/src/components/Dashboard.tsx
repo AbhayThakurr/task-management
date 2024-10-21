@@ -1,4 +1,3 @@
-// src/components/Dashboard.tsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
@@ -24,6 +23,7 @@ const Dashboard: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null); // State for tracking which task is being deleted
   const { token, role } = useAuth();
   const navigate = useNavigate();
 
@@ -77,6 +77,7 @@ const Dashboard: React.FC = () => {
   }, [role]);
 
   const deleteTask = async (taskId: string) => {
+    setDeletingTaskId(taskId); // Set the task ID being deleted
     try {
       await fetch(
         `${import.meta.env.VITE_REACT_APP_API_URL}/api/tasks/${taskId}`,
@@ -90,6 +91,8 @@ const Dashboard: React.FC = () => {
       fetchTasks();
     } catch (err) {
       console.error(err);
+    } finally {
+      setDeletingTaskId(null); // Reset the deleting state
     }
   };
 
@@ -176,9 +179,12 @@ const Dashboard: React.FC = () => {
                       </select>
                       <button
                         onClick={() => deleteTask(task._id)}
-                        className="text-red-500 hover:text-red-700"
+                        className={`text-red-500 hover:text-red-700 ${
+                          deletingTaskId === task._id ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        disabled={deletingTaskId === task._id} // Disable while deleting
                       >
-                        Delete
+                        {deletingTaskId === task._id ? "Deleting..." : "Delete"}
                       </button>
                     </>
                   ) : (
