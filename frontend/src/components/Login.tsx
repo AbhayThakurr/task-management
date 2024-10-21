@@ -20,12 +20,17 @@ const Login: React.FC = () => {
         }
       );
       const data = await res.json();
-      if (data.token) {
+      if (res.ok && data.token) {
         login(data.token, data.role);
+        alert("User  logged in successfully!"); // Alert for successful login
         navigate("/dashboard");
+      } else {
+        // Handle error messages from the server
+        alert(data.message || "An error occurred. Please try again."); // Alert for error messages
       }
     } catch (err) {
       console.error(err);
+      alert("An error occurred. Please try again later."); // Alert for network issues
     }
   };
 
@@ -36,6 +41,7 @@ const Login: React.FC = () => {
         className="bg-white p-6 rounded shadow-md w-96"
       >
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+
         <input
           type="email"
           value={email}
