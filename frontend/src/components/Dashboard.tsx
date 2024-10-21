@@ -144,7 +144,11 @@ const Dashboard: React.FC = () => {
       )}
 
       {tasks.length === 0 ? (
-        <p className="text-gray-600">No tasks assigned to you.</p>
+        <p className="text-gray-600">
+          {role === "user"
+            ? "No tasks assigned to you."
+            : "You have not assigned any tasks to anyone."}
+        </p>
       ) : (
         <div className="grid gap-4">
           {tasks.map((task) => (
